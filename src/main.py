@@ -1,4 +1,4 @@
-from nakuru import CQHTTP
+from nakuru import CQHTTP, GroupMessage, FriendMessage
 from dotenv import load_dotenv
 import os
 
@@ -11,6 +11,32 @@ app = CQHTTP(
     http_port=os.getenv("HTTP_PORT") or 5700,
     token=os.getenv("TOKEN"),
 )
+
+
+@app.receiver("FriendMessage")
+async def _(app: CQHTTP, source: FriendMessage):
+    msg = source.raw_message
+
+    if msg == "在吗":
+        return await app.sendFriendMessage(
+            user_id=source.user_id,
+            message="在的",
+        )
+
+
+@app.receiver("GroupMessage")
+async def _(app: CQHTTP, source: GroupMessage):
+    if not source.raw_message[:5].lower() == "jris ":
+        return
+
+    msg = source.raw_message[5:]
+
+    if msg == "摸摸头":
+        return await app.sendGroupMessage(
+            group_id=source.group_id,
+            message="摸摸头",
+        )
+
 
 if __name__ == "__main__":
     app.run()
