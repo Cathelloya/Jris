@@ -1,16 +1,15 @@
-from aiohttp import web
+from nakuru import CQHTTP
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
 
-async def handle(request):
-    return web.Response(text="Hello, world!")
+app = CQHTTP(
+    host=os.getenv("HOST"),
+    port=os.getenv("PORT"),
+    http_port=os.getenv("HTTP_PORT"),
+    token=os.getenv("TOKEN"),
+)
 
-
-app = web.Application()
-app.add_routes([web.get("/", handle)])
-
-if __name__ == "__main__":
-    web.run_app(app, port=os.getenv("LISTEN_PORT"))
+app.run()
