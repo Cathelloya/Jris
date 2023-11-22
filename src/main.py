@@ -6,10 +6,11 @@ load_dotenv()
 
 
 app = CQHTTP(
-    host=os.getenv("HOST"),
-    port=os.getenv("PORT"),
-    http_port=os.getenv("HTTP_PORT"),
+    host=os.getenv("HOST") or "127.0.0.1",
+    port=os.getenv("PORT") or 5701,
+    http_port=os.getenv("HTTP_PORT") or 5700,
     token=os.getenv("TOKEN"),
 )
 
-app.run()
+if __name__ == "__main__":
+    app.run()
