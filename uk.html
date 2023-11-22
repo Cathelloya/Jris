@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Web UI | Cloudflare Workers AI</title>
+<script src="https://unpkg.com/alpinejs" defer></script>
+<script src="https://cdn.twind.style"></script>
+</head>
+<body class="w-full min-h-screen dark:(bg-gray-900 text-gray-50)">
+<div class="container mx-auto">
+<div class="flex flex-col md:flex-row m-4 gap-4 items-center justify-center">
+<a href="/" class="whitespace-nowrap w-full border-b-4  text-gray-700 dark:text-gray-500 ">
+Image Generation
+</a>
+<a href="/instruct" class="whitespace-nowrap w-full border-b-4  border-blue-500 ">
+Instruct LLM
+</a>
+<a href="/similarity" class="whitespace-nowrap w-full border-b-4  text-gray-700 dark:text-gray-500 ">
+Embedding Similarity
+</a>
+<a href="/transcription" class="whitespace-nowrap w-full border-b-4  text-gray-700 dark:text-gray-500 ">
+Transcription
+</a>
+</div>
+<div class="p-4"><div x-data="{ prompt: '', loading: false, abortController: null }">
+<textarea class="border-2 rounded-lg w-full resize-y p-2 dark:(bg-gray-900 text-gray-50)" rows="10" x-model="prompt" x-ref="textinput" placeholder="Type here..." :disabled="loading" @keydown.cmd.enter.prevent="await generateTextAndUpdateUI($data)" @keydown.ctrl.enter.prevent="await generateTextAndUpdateUI($data)"></textarea>
+<div class="mt-2 w-full flex justify-center gap-4">
+<button class="bg-blue-500 disabled:bg-yellow-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" x-text="loading ? 'Stop' : 'Generate'" :disabled="!prompt" @click="await generateTextAndUpdateUI($data)"></button>
+<button :disabled="!prompt || loading" class="bg-blue-500 disabled:bg-yellow-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" @click="prompt = wrapSelectedText($refs.textinput, '[INST] ', ' [/INST]')">
+As Instruction
+</button>
+</div>
+</div>
+<script type="module">
+    'use strict';
+
+    import { fetchEventSource } from 'https://esm.sh/@microsoft/fetch-event-source';
+
+    window.generateText = async function* (prompt, signal) {
+        const queue = [];
+
+        fetchEventSource('/api/run/@cf/mistral/mistral-7b-instruct-v0.1', {
+            method: 'POST',
+            body: JSON.stringify({
+                prompt,
+                stream: true,
+            }),
+            signal,
+
+            onmessage(msg) {
+                let data = msg.data;
+                if (data !== '[DONE]') {
+                    data = JSON.parse(data).response;
+                }
+                queue.push(data);
+            },
+
+            onclose() {
+                queue.push('[DONE]');
+            },
+
+            onerror(e) {
+                console.error(e);
+                queue.push('[DONE]');
+            },
+        });
+
+        signal?.addEventListener('abort', () => {
+            queue.push('[DONE]');
+        });
+
+        for (;;) {
+            await new Promise(r => setTimeout(r));
+
+            const token = queue.shift();
+            if (!token) continue;
+            if (token === '[DONE]') break;
+            yield token;
+        }
+    };
+</script>
+<script>
+    'use strict';
+
+    async function generateTextAndUpdateUI($data) {
+        if ($data.loading) {
+            $data.abortController.abort();
+            return;
+        }
+
+        $data.loading = true;
+        $data.abortController = new AbortController();
+
+
+        if (!$data.prompt.startsWith('<s>')) {
+            $data.prompt = '<s>' + $data.prompt;
+        }
+
+        if ($data.prompt.endsWith('</s>')) {
+            $data.prompt = $data.prompt.slice(0, -'</s>'.length);
+        }
+
+        let lastToken;
+        let lastTokenCount = 0;
+
+        const tokenStream = generateText(
+            $data.prompt,
+            $data.abortController.signal
+        );
+
+        for await (const token of tokenStream) {
+            $data.prompt += token;
+
+            if (token === lastToken) {
+                lastTokenCount++;
+            } else {
+                lastToken = token;
+                lastTokenCount = 1;
+            }
+        }
+
+        if (lastTokenCount > 1) {
+            $data.prompt = $data.prompt.slice(0, -lastToken.length);
+            $data.prompt += '</s>';
+        }
+
+        $data.loading = false;
+    }
+
+    function wrapSelectedText(textarea, prefix, suffix) {
+        let startPos = textarea.selectionStart;
+        let endPos = textarea.selectionEnd;
+
+        if (startPos === endPos) {
+            startPos = 0;
+            endPos = textarea.value.length;
+        }
+
+        const textBefore = textarea.value.slice(0, startPos);
+        const selectedText = textarea.value.slice(startPos, endPos);
+        const textAfter = textarea.value.slice(endPos);
+
+        let updatedText = textBefore;
+
+        if (textBefore.endsWith(prefix) || selectedText.startsWith(prefix)) {
+            updatedText += selectedText;
+        } else {
+            updatedText += prefix + selectedText;
+        }
+
+        if (textAfter.startsWith(suffix) || selectedText.endsWith(suffix)) {
+            updatedText += textAfter;
+        } else {
+            updatedText += suffix + textAfter;
+        }
+
+        return updatedText;
+    }
+</script>
+</div>
+</div>
+</body>
+</html>
