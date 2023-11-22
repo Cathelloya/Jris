@@ -1,5 +1,6 @@
 from nakuru import CQHTTP, GroupMessage, FriendMessage
 from dotenv import load_dotenv
+from .reply_dict import reply_to
 import os
 
 load_dotenv()
@@ -17,11 +18,10 @@ app = CQHTTP(
 async def _(app: CQHTTP, source: FriendMessage):
     msg = source.raw_message
 
-    if msg == "在吗":
-        return await app.sendFriendMessage(
-            user_id=source.user_id,
-            message="在的",
-        )
+    await app.sendFriendMessage(
+        user_id=source.user_id,
+        message=reply_to(msg) or "我不知道你在说什么呢。",
+    )
 
 
 @app.receiver("GroupMessage")
@@ -31,11 +31,10 @@ async def _(app: CQHTTP, source: GroupMessage):
 
     msg = source.raw_message[5:]
 
-    if msg == "摸摸头":
-        return await app.sendGroupMessage(
-            group_id=source.group_id,
-            message="摸摸头",
-        )
+    await app.sendGroupMessage(
+        group_id=source.group_id,
+        message=reply_to(msg) or "我不知道你在说什么呢。",
+    )
 
 
 if __name__ == "__main__":
