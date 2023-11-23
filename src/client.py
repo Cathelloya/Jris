@@ -7,12 +7,11 @@ if CLIENT_PORT is None:
 
 BASE_URL = "http://localhost:" + CLIENT_PORT
 
-session = ClientSession()
-
 
 async def send_data(path: str, data: dict[str]) -> int:
-    async with session.post(BASE_URL + path, data=data) as response:
-        return response.status
+    async with ClientSession() as session:
+        async with session.post(BASE_URL + path, data=data) as response:
+            return response.status
 
 
 async def send_message(data: dict[str]):
