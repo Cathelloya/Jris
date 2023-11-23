@@ -5,7 +5,7 @@ import os
 
 
 async def handle_message(data: dict[str]):
-    if data['sub_type'] == 'friend':
+    if data['message_type'] == 'private':
         msg = data['raw_message']
         user_id = data['user_id']
         await client.send_message({
