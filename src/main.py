@@ -7,7 +7,7 @@ import os
 
 async def handle_message(data: dict[str]):
     if data['message_type'] == 'private':
-        msg = reply_dict.reply_to(data.get('raw_message')) or "我听不懂。"
+        msg = reply_dict.reply_to(data['raw_message']) or "我听不懂。"
         user_id = data['user_id']
 
         await client.send_message({
