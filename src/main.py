@@ -14,6 +14,7 @@ async def handle_message(data: dict[str]):
             "user_id": user_id,
             "message": msg
         })
+
     elif data['message_type'] == 'group':
         user_msg: str = data['raw_message']
         if not user_msg[:5].lower() == 'jris ':

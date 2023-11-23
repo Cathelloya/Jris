@@ -1,7 +1,8 @@
 from aiohttp import web
 from collections.abc import Callable
+from typing import Awaitable
 
-event_handlers: dict[str, Callable[[dict[str]], []]] = {}
+event_handlers: dict[str, Callable[[dict[str]], Awaitable]] = {}
 
 
 async def handle(request):
