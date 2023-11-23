@@ -1,14 +1,20 @@
 import server
 import client
 import reply_dict
+import ai_models
 from aiohttp import web
 import os
 
 
 async def handle_message(data: dict[str]):
     if data['message_type'] == 'private':
-        msg = reply_dict.reply_to(data['raw_message']) or "我听不懂。"
         user_id = data['user_id']
+
+        input_msg = data['raw_message']
+
+        msg = reply_dict.reply_to(input_msg)
+        if msg is None:
+            msg = ai_models.instruct_llm(input_msg)
 
         await client.send_message({
             "user_id": user_id,
@@ -16,12 +22,16 @@ async def handle_message(data: dict[str]):
         })
 
     elif data['message_type'] == 'group':
+        group_id = data['group_id']
         user_msg: str = data['raw_message']
         if not user_msg[:5].lower() == 'jris ':
             return
 
-        msg = reply_dict.reply_to(user_msg[5:]) or "我听不懂。"
-        group_id = data['group_id']
+        input_msg = user_msg[5:]
+
+        msg = reply_dict.reply_to(input_msg) or "我听不懂。"
+        if msg is None:
+            msg = ai_models.instruct_llm(input_msg)
 
         await client.send_message({
             "group_id": group_id,
