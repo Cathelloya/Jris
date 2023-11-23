@@ -8,8 +8,8 @@ load_dotenv()
 
 app = CQHTTP(
     host=os.getenv("HOST") or "127.0.0.1",
-    port=os.getenv("PORT") or 5701,
-    http_port=os.getenv("HTTP_PORT") or 5700,
+    port=os.getenv("PORT") or 5700,
+    http_port=os.getenv("HTTP_PORT") or 5701,
     token=os.getenv("TOKEN"),
 )
 
