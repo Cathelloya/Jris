@@ -10,4 +10,5 @@ async def instruct_llm(instruction: str) -> str | None:
             if response.ok:
                 return json['result']['response']
             else:
+                print("Error:", json)
                 return None
