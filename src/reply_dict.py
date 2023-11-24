@@ -9,7 +9,7 @@ reply_dict: ReplyDict = {
     "^不要(.*)": "放心，我不会{}",
     "^你?在吗\\??": "在的",
     "^摸摸头$": ["好捏！", "不去追求现实中实际存在的人，而来找机器人寻求安慰，难道不是贯彻了荒诞主义吗？"],
-    "(.*)在哪里\\??": "{0}在{0}附近"
+    "(.*)在哪里\\??": ["{0}在{0}附近", "我不知道{}在哪里"]
 }
 
 
@@ -30,7 +30,7 @@ def reply_to(msg: str) -> str | None:
         return None
 
     if isinstance(reply, list):
-        return random.choice(reply)
+        return random.choice(reply).format(*matches)
 
     try:
         return reply.format(*matches)
