@@ -20,7 +20,7 @@ def reply_to(msg: str) -> str | None:
     matches: list[str] = []
 
     for k, v in reply_dict.items():
-        new_matches = re.match(k.format(*matches), msg)
+        new_matches = re.match(k, msg)
         if new_matches:
             reply = v
             matches.extend(new_matches.groups())
