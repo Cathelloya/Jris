@@ -24,6 +24,8 @@ reply_dict: ReplyDict = {
     r".+": lambda m, _: ai_models.instruct_llm(m)
 }
 
+regex_cache: dict[str, re.Pattern[str]] = {}
+
 
 async def reply_to(msg: str) -> str:
     msg = msg.strip()
@@ -32,7 +34,12 @@ async def reply_to(msg: str) -> str:
     matches: list[str] = []
 
     for k, v in reply_dict.items():
-        new_matches = re.match(k, msg)
+        pattern = regex_cache.get(k)
+        if pattern is None:
+            pattern = re.compile(k)
+            regex_cache[k] = pattern
+
+        new_matches = pattern.match(msg)
         if new_matches:
             reply = v
             matches.extend(new_matches.groups())
