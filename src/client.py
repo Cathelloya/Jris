@@ -1,5 +1,6 @@
 import os
 from aiohttp import ClientSession
+from typing import Any
 
 CLIENT_PORT = os.getenv("CLIENT_PORT")
 if CLIENT_PORT is None:
@@ -8,12 +9,12 @@ if CLIENT_PORT is None:
 BASE_URL = "http://localhost:" + CLIENT_PORT
 
 
-async def send_data(path: str, data: dict[str]) -> int:
+async def send_data(path: str, data: dict[str, Any]) -> int:
     async with ClientSession() as session:
         async with session.post(BASE_URL + path, data=data) as response:
             return response.status
 
 
-async def send_message(data: dict[str]):
+async def send_message(data: dict[str, Any]):
     if await send_data("/send_msg", data) != 200:
         print("Error: failed to send message")

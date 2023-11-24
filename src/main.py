@@ -14,7 +14,7 @@ async def handle_message(data: dict[str]):
 
         msg = reply_dict.reply_to(input_msg)
         if msg is None:
-            msg = await ai_models.instruct_llm(input_msg)
+            msg = await ai_models.instruct_llm(input_msg) or "我听不懂。"
 
         await client.send_message({
             "user_id": user_id,
@@ -29,9 +29,9 @@ async def handle_message(data: dict[str]):
 
         input_msg = user_msg[5:]
 
-        msg = reply_dict.reply_to(input_msg) or "我听不懂。"
+        msg = reply_dict.reply_to(input_msg)
         if msg is None:
-            msg = await ai_models.instruct_llm(input_msg)
+            msg = await ai_models.instruct_llm(input_msg) or "我不知道。"
 
         await client.send_message({
             "group_id": group_id,
