@@ -1,7 +1,6 @@
 import server
 import client
 import reply_dict
-import ai_models
 from aiohttp import web
 import os
 
@@ -12,9 +11,7 @@ async def handle_message(data: dict[str]):
 
         input_msg = data['raw_message']
 
-        msg = reply_dict.reply_to(input_msg)
-        if msg is None:
-            msg = await ai_models.instruct_llm(input_msg) or "我听不懂。"
+        msg = await reply_dict.reply_to(input_msg)
 
         await client.send_message({
             "user_id": user_id,
@@ -29,9 +26,7 @@ async def handle_message(data: dict[str]):
 
         input_msg = user_msg[5:]
 
-        msg = reply_dict.reply_to(input_msg)
-        if msg is None:
-            msg = await ai_models.instruct_llm(input_msg) or "我不知道。"
+        msg = await reply_dict.reply_to(input_msg)
 
         await client.send_message({
             "group_id": group_id,
