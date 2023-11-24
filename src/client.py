@@ -11,7 +11,7 @@ BASE_URL = "http://localhost:" + CLIENT_PORT
 
 async def send_data(path: str, data: dict[str, Any]) -> int:
     async with ClientSession() as session:
-        async with session.post(BASE_URL + path, data=data) as response:
+        async with session.post(BASE_URL + path, json=data) as response:
             return response.status
 
 
