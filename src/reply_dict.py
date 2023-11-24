@@ -5,7 +5,8 @@ from typing import Union, Callable, Awaitable
 import ai_models
 import utils
 
-ReplyDictValue = Union[str, list[str], Callable[[str, list[str]], Union[Awaitable[str], str]]]
+ReplyFunc = Callable[[str, list[str]], Union[Awaitable[str], str]]
+ReplyDictValue = Union[str, list[str], ReplyFunc, list[ReplyFunc]]
 ReplyDict = dict[str, ReplyDictValue]
 
 reply_dict: ReplyDict = {
@@ -14,9 +15,12 @@ reply_dict: ReplyDict = {
     r"^摸摸头$": ["好捏！", "不去追求现实中实际存在的人，而来找机器人寻求安慰，难道不是贯彻了荒诞主义吗？"],
     r"(.+)在哪里\??": ["{0}在{0}附近", "我不知道{}在哪里"],
     r"^可以(.+)吗": ["当然可以{}", "打咩，绝对不可以{}!"],
-    r"^画(.+)": lambda _, m: utils.encode_cqcode({
-        "_type": "image",
-        "url": ai_models.get_text_to_image_url(m[0].strip())}),
+    r"^画(.+)": [
+        lambda _, m: utils.encode_cqcode({
+            "_type": "image",
+            "url": ai_models.get_text_to_image_url(m[0].strip())}),
+        "不想画了，放过我吧"
+    ],
     r".+": lambda m, _: ai_models.instruct_llm(m)
 }
 
@@ -34,6 +38,9 @@ async def reply_to(msg: str) -> str:
             matches.extend(new_matches.groups())
             break
 
+    if isinstance(reply, list):
+        reply = random.choice(reply)
+
     if reply is None:
         return "不知该如何回答呢..."
 
@@ -43,9 +50,6 @@ async def reply_to(msg: str) -> str:
             return await result
         else:
             return result
-
-    if isinstance(reply, list):
-        return random.choice(reply).format(*matches)
 
     try:
         return reply.format(*matches)
