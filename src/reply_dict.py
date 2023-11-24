@@ -3,8 +3,9 @@ import random
 import re
 from typing import Union, Callable, Awaitable
 import ai_models
+import utils
 
-ReplyDictValue = Union[str, list[str], Callable[[str, list[str]], Awaitable[str]]]
+ReplyDictValue = Union[str, list[str], Callable[[str, list[str]], Union[Awaitable[str], str]]]
 ReplyDict = dict[str, ReplyDictValue]
 
 reply_dict: ReplyDict = {
@@ -13,6 +14,9 @@ reply_dict: ReplyDict = {
     r"^摸摸头$": ["好捏！", "不去追求现实中实际存在的人，而来找机器人寻求安慰，难道不是贯彻了荒诞主义吗？"],
     r"(.+)在哪里\??": ["{0}在{0}附近", "我不知道{}在哪里"],
     r"^可以(.+)吗": ["当然可以{}", "打咩，绝对不可以{}!"],
+    r"^画(.+)": lambda _, m: utils.encode_cqcode({
+        "_type": "image",
+        "url": ai_models.get_text_to_image_url(m[0].strip())}),
     r".+": lambda m, _: ai_models.instruct_llm(m)
 }
 
@@ -34,7 +38,11 @@ async def reply_to(msg: str) -> str:
         return "不知该如何回答呢..."
 
     if callable(reply):
-        return await reply(msg, matches)
+        result = reply(msg, matches)
+        if isinstance(result, Awaitable):
+            return await result
+        else:
+            return result
 
     if isinstance(reply, list):
         return random.choice(reply).format(*matches)
@@ -52,7 +60,7 @@ async def run_tests():
     print(await reply_to("不要回复"))
     print(await reply_to("摸摸头"))
     print(await reply_to("你在哪里?"))
-    print(await reply_to(""))
+    print(await reply_to("画 a cat"))
 
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 from aiohttp import ClientSession
+import urllib.parse
 import asyncio
 
 
@@ -13,6 +14,11 @@ async def instruct_llm(instruction: str) -> str | None:
             else:
                 print("Error:", json)
                 return None
+
+
+def get_text_to_image_url(prompt: str) -> str:
+    url = 'https://ai.ihack.uk/api/run/@cf/stabilityai/stable-diffusion-xl-base-1.0?prompt='
+    return url + urllib.parse.quote(prompt, safe='')
 
 
 if __name__ == '__main__':
