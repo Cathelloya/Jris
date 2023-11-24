@@ -9,7 +9,7 @@ async def instruct_llm(instruction: str) -> str | None:
         async with session.post(url, json={"prompt": prompt}) as response:
             json = await response.json()
             if response.ok:
-                return json['result']['response']
+                return json['result']['response'].strip()
             else:
                 print("Error:", json)
                 return None
