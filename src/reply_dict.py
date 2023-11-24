@@ -7,9 +7,9 @@ ReplyDict = dict[str, ReplyDictValue]
 
 reply_dict: ReplyDict = {
     "^不要(.*)": "放心，我不会{}",
-    "^你?在吗\\??": "在的",
+    r"^你?在吗\??": "在的",
     "^摸摸头$": ["好捏！", "不去追求现实中实际存在的人，而来找机器人寻求安慰，难道不是贯彻了荒诞主义吗？"],
-    "(.*)在哪里\\??": ["{0}在{0}附近", "我不知道{}在哪里"]
+    r"(.*)在哪里\??": ["{0}在{0}附近", "我不知道{}在哪里"]
 }
 
 
@@ -40,7 +40,7 @@ def reply_to(msg: str) -> str | None:
 
 if __name__ == '__main__':
     print(reply_to("在吗?"))
-    print(reply_to("你在吗?"))
+    print(reply_to("你在吗"))
     print(reply_to("他在吗?"))
     print(reply_to("不要回复"))
     print(reply_to("摸摸头"))
