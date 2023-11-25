@@ -18,7 +18,7 @@ reply_dict: ReplyDict = {
     r"^画(.+)": [
         lambda _, m: utils.encode_cqcode({
             "_type": "image",
-            "url": ai_models.get_text_to_image_url(m[0].strip())}),
+            "file": ai_models.get_text_to_image_url(m[0].strip())}),
         "不想画了，放过我吧"
     ],
     r".+": lambda m, _: ai_models.instruct_llm(m)
