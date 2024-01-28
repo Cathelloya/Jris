@@ -1,0 +1,2 @@
+astrometry-net-client
+aiohttp
