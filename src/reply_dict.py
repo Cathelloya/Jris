@@ -9,7 +9,6 @@ ReplyFunc = Callable[[str, list[str]], Union[Awaitable[str], str]]
 ReplyDictValue = Union[str, list[str], ReplyFunc, list[ReplyFunc]]
 ReplyDict = dict[str, ReplyDictValue]
 
-
 reply_dict: ReplyDict = {
     r"^不要(.+)": "放心，我不会{}",
     r"^你?在吗\??": "在的",
