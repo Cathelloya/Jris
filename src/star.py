@@ -1,14 +1,19 @@
-import requests
+import aiohttp
+import asyncio
 import os
+from urllib.parse import urlparse
+from pathlib import Path
 from astrometry_net_client import Session
 from astrometry_net_client import FileUpload
+from dotenv import dotenv_values
+import aiohttp
+import requests
 
-# hello
-# url_image = 'https://c2cpicdw.qpic.cn/offpic_new/2016741487//2016741487-3567923580-B88EFE28A92703A92CD1B21181ADCA5C/0?term=2&amp;is_origin=0'
+config = dotenv_values("../.env")  # config = {"USER": "foo", "EMAIL": "foo@example.org"}
 
-def star(url_image: str):
+async def star(url_image: str):
     # Initial Session
-    s = Session(api_key='kjelalvdcvfvseuu')
+    s = Session(api_key=config["API_astrometry_net"])
 
     # 下载图像并保存为本地文件
     local_filename = './tmp/local_image.jpg'
@@ -30,8 +35,17 @@ def star(url_image: str):
     addr = "http://nova.astrometry.net/annotated_display/" + jobid
 
     # 等待 job 完成
-    job.until_done()
+    await job.until_done()
 
     # 删除本地文件
     os.remove(local_filename)
     return addr
+
+async def main():
+    url_image = 'https://c2cpicdw.qpic.cn/offpic_new/2016741487//2016741487-3567923580-B88EFE28A92703A92CD1B21181ADCA5C/0?term=2&amp;is_origin=0'
+
+    result = await star(url_image)
+    print(f'Astrometry.net result: {result}')
+
+if __name__ == "__main__":
+    asyncio.run(main())
