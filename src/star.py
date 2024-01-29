@@ -3,6 +3,7 @@ import os
 from astrometry_net_client import Session
 from astrometry_net_client import FileUpload
 
+# hello
 # url_image = 'https://c2cpicdw.qpic.cn/offpic_new/2016741487//2016741487-3567923580-B88EFE28A92703A92CD1B21181ADCA5C/0?term=2&amp;is_origin=0'
 
 def star(url_image: str):
