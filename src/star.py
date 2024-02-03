@@ -1,4 +1,3 @@
-import aiohttp
 import asyncio
 import os
 from urllib.parse import urlparse
@@ -8,15 +7,25 @@ from astrometry_net_client import FileUpload
 from dotenv import dotenv_values
 import aiohttp
 import requests
+import datetime
 
-config = dotenv_values("../.env")  # config = {"USER": "foo", "EMAIL": "foo@example.org"}
+
+
 
 async def star(url_image: str):
+    # 获取当前时间
+    current_time = datetime.datetime.now()
+
+    # 格式化时间为字符串，作为文件名
+    formatted_time = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+
+    config = dotenv_values("../.env")  
+
     # Initial Session
     s = Session(api_key=config["API_astrometry_net"])
 
     # 下载图像并保存为本地文件
-    local_filename = './tmp/local_image.jpg'
+    local_filename = f'./tmp/local_image_{formatted_time}.jpg'  # 添加时间戳到文件名
     response = requests.get(url_image)
     with open(local_filename, 'wb') as f:
         f.write(response.content)
@@ -35,7 +44,7 @@ async def star(url_image: str):
     addr = "http://nova.astrometry.net/annotated_display/" + jobid
 
     # 等待 job 完成
-    await job.until_done()
+    job.until_done()
 
     # 删除本地文件
     os.remove(local_filename)
