@@ -17,9 +17,9 @@ Jris 是一个用 Python 编写的 WIP QQ 聊天机器人。
 <br />
 
 
-  <h3 align="center">"完美的"README模板</h3>
+  <h3 align="center">Jris使用指南</h3>
   <p align="center">
-    一个"完美的"README模板去快速开始你的项目！
+    一个"简单的指南"去快速部署Jris！
     <br />
     <a href="https://github.com/Cathelloya/Jris"><strong>探索本项目的文档 »</strong></a>
     <br />
@@ -56,9 +56,6 @@ Jris 是一个用 Python 编写的 WIP QQ 聊天机器人。
 
 ### 上手指南
 
-请将所有链接中的“Cathelloya/Jris”改为“your_github_name/your_repository”
-
-
 
 ###### 开发前的配置要求
 
@@ -67,7 +64,7 @@ Jris 是一个用 Python 编写的 WIP QQ 聊天机器人。
 
 ###### **安装步骤**
 
-1. Get a free API Key at [https://nova.astrometry.net/](https://nova.astrometry.net/)
+1. 从网站获得一个免费的API key [https://nova.astrometry.net/](https://nova.astrometry.net/)
 2. Clone the repo
 
 ```sh
@@ -145,7 +142,7 @@ xxx@xxxx
 
 ### 版权说明
 
-该项目签署了MIT 授权许可，详情请参阅 [LICENSE.txt](https://github.com/Cathelloya/Jris/blob/master/LICENSE.txt)
+该项目签署了AGPL-3.0 授权许可，详情请参阅 [LICENSE.txt](https://github.com/Cathelloya/Jris/blob/master/LICENSE.txt)
 
 ### 鸣谢
 
